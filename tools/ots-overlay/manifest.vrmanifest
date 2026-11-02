@@ -1,0 +1,21 @@
+{
+	"source": "builtin",
+	"applications": [
+		{
+			"app_key": "ots.trackingstabilizer.manager",
+			"launch_type": "binary",
+			"binary_path_windows": "ots-overlay.exe",
+			"is_dashboard_overlay": true,
+			"strings": {
+				"en_us": {
+					"name": "Tracking Stabilizer",
+					"description": "Device / base station manager and tracking-loss filter controls"
+				},
+				"ja_jp": {
+					"name": "Tracking Stabilizer",
+					"description": "デバイスとベースステーションの管理、トラッキングロスト対策の設定"
+				}
+			}
+		}
+	]
+}

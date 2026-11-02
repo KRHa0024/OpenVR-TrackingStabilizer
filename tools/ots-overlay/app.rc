@@ -1,0 +1,2 @@
+// Executable icon (window, taskbar, Explorer). Resource id 1 is loaded by DesktopWindow.
+1 ICON "app.ico"

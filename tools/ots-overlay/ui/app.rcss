@@ -1,0 +1,292 @@
+/*
+ * Styles for app.rml. ${name} tokens are theme colors filled in by UiApp (Theme.cpp) before loading,
+ * so switching themes reloads the document with a new copy of this sheet.
+ */
+
+/* RmlUi has no user-agent stylesheet: give the block elements we use a display. */
+body, div, p, h1, h2, h3, section, header, main, nav, label, row { display: block; }
+span, svg, img { display: inline-block; }
+
+body {
+	width: 1120dp;
+	height: 700dp;
+	box-sizing: border-box;
+	background-color: ${bg};
+	color: ${text};
+	font-family: ui;
+	font-size: 16dp;
+	padding: 0 14dp 14dp 14dp;
+	display: flex;
+	flex-direction: column;
+}
+body.ja { word-break: break-all; } /* RmlUi only breaks at spaces; Japanese has none */
+
+.mono { font-family: mono; }
+.dim { color: ${dim}; }
+.grow { flex: 1 1 0; min-width: 0; min-height: 0; }
+.row { display: flex; flex-direction: row; align-items: center; }
+.col { display: flex; flex-direction: column; }
+.nowrap { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ---- header ---- */
+header { height: 56dp; flex: 0 0 56dp; display: flex; flex-direction: row; align-items: center; gap: 10dp; border-bottom: 1dp ${line}; }
+header img.appicon { width: 30dp; height: 30dp; }
+header h1 { font-size: 19dp; font-weight: bold; color: ${accentText}; }
+header .version { font-size: 13dp; color: ${dim}; margin-top: 4dp; }
+header .badge { font-size: 14dp; padding: 4dp 10dp; border-radius: 999dp; background-color: ${lostSoft}; color: ${lost}; }
+header .warn { font-size: 14dp; padding: 4dp 10dp; border-radius: 999dp; background-color: ${holdSoft}; color: ${hold}; }
+nav { display: flex; flex-direction: row; gap: 6dp; }
+.tab { position: relative; width: 46dp; height: 38dp; box-sizing: border-box; border-radius: 10dp; border: 1dp ${line};
+	background-color: ${button}; display: flex; flex-direction: row; align-items: center; justify-content: center; cursor: pointer; }
+.tab:hover { border-color: ${accent}; }
+.tab.current { background-color: ${accent}; border-color: ${accent}; }
+.tab svg { width: 20dp; height: 20dp; image-color: ${text}; }
+.tab.current svg { image-color: ${onAccent}; }
+
+/* Hover tooltips for icon-only buttons. */
+/* Fixed width: RmlUi shrinks an absolutely positioned box to its containing block (the small button). */
+.tip { display: none; position: absolute; right: 0; top: 44dp; z-index: 30; width: 120dp; box-sizing: border-box; padding: 6dp 10dp;
+	border-radius: 8dp; background-color: ${panel}; border: 1dp ${line}; color: ${text}; font-size: 14dp; text-align: center;
+	white-space: nowrap; box-shadow: rgba(0,0,0,0.35) 0 6dp 18dp 0; }
+.tab:hover .tip, .seg div:hover .tip { display: block; }
+.seg .tip { top: 38dp; }
+
+main { flex: 1 1 0; min-height: 0; display: flex; flex-direction: row; gap: 12dp; padding-top: 12dp; }
+/* Screens taller than the window scroll (the device tables with many devices). */
+main.stack { flex-direction: column; overflow-y: auto; }
+main.stack > * { flex: 0 0 auto; }
+
+/* ---- panels ---- */
+.panel { background-color: ${panel}; border: 1dp ${line}; border-radius: 10dp; padding: 10dp 14dp; box-sizing: border-box;
+	display: flex; flex-direction: column; gap: 8dp; }
+h2 { font-size: 17dp; font-weight: bold; color: ${accentText}; display: flex; flex-direction: row; align-items: center; gap: 8dp; }
+h2 svg { width: 20dp; height: 20dp; image-color: ${accentText}; }
+.settings h2 { font-size: 18dp; }
+.settings h2 svg { width: 20dp; height: 20dp; }
+h3 { font-size: 17dp; font-weight: bold; }
+
+/* generic controls */
+.btn { height: 36dp; padding: 0 12dp; border-radius: 10dp; border: 1dp ${line}; background-color: ${button}; color: ${text};
+	font-size: 15dp; display: flex; flex-direction: row; align-items: center; gap: 8dp; cursor: pointer; }
+.btn:hover { border-color: ${accent}; }
+.btn svg { width: 18dp; height: 18dp; image-color: ${text}; }
+.btn.icon { width: 34dp; height: 34dp; padding: 0; justify-content: center; }
+.btn.small { height: 32dp; padding: 0 10dp; font-size: 14dp; border-radius: 8dp; }
+.btn.danger { background-color: ${lost}; border-color: ${lost}; color: #ffffff; }
+.btn.danger svg { image-color: #ffffff; }
+.btn.pressed { background-color: ${accentSoft}; border-color: ${accent}; }
+
+/* Segmented buttons. No overflow: hidden (it would clip the tooltips); the ends get their own corners. */
+.seg { display: flex; flex-direction: row; border: 1dp ${line}; border-radius: 10dp; }
+.seg div { position: relative; height: 32dp; min-width: 64dp; padding: 0 12dp; font-size: 14dp; display: flex; flex-direction: row; align-items: center;
+	justify-content: center; gap: 6dp; cursor: pointer; }
+.seg div:first-child { border-radius: 9dp 0 0 9dp; }
+.seg div:last-child { border-radius: 0 9dp 9dp 0; }
+.seg.icons div { min-width: 40dp; padding: 0; }
+.seg.icons div svg { width: 18dp; height: 18dp; }
+.seg div:hover { background-color: ${accentSoft}; }
+.seg div.on { background-color: ${accent}; color: ${onAccent}; }
+.seg div svg { width: 16dp; height: 16dp; image-color: ${text}; }
+.seg div.on svg { image-color: ${onAccent}; }
+.seg.big div { height: 36dp; min-width: 96dp; font-size: 15dp; }
+
+.switch { width: 44dp; height: 26dp; flex: 0 0 44dp; border-radius: 999dp; padding: 3dp; box-sizing: border-box; background-color: ${line};
+	display: flex; flex-direction: row; justify-content: flex-start; cursor: pointer; }
+.switch.on { background-color: ${ok}; justify-content: flex-end; }
+/* Dimmed with colors, not opacity: an opacity layer leaves seams across the knob at fractional render scales. */
+.switch.locked { background-color: ${rowAlt}; cursor: default; }
+.switch.locked.on { background-color: ${okSoft}; }
+.switch.locked .knob { background-color: ${dim}; }
+.switch .knob { width: 20dp; height: 20dp; border-radius: 999dp; background-color: #ffffff; }
+.switch.small { width: 36dp; height: 20dp; flex: 0 0 36dp; }
+.switch.small .knob { width: 14dp; height: 14dp; }
+
+.check { display: flex; flex-direction: row; align-items: center; gap: 10dp; min-height: 34dp; cursor: pointer; }
+.check .box { width: 20dp; height: 20dp; flex: 0 0 20dp; box-sizing: border-box; border-radius: 5dp; border: 2dp ${dim};
+	display: flex; flex-direction: row; align-items: center; justify-content: center; }
+.check.on .box { background-color: ${accent}; border-color: ${accent}; }
+.check .box svg { width: 14dp; height: 14dp; image-color: ${onAccent}; display: none; }
+.check.on .box svg { display: inline-block; }
+
+/* ---- correction screen ---- */
+.leftcol { width: 600dp; flex: 0 0 600dp; display: flex; flex-direction: column; gap: 12dp; }
+.rightcol { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 12dp; }
+
+.hero { height: 64dp; flex: 0 0 64dp; flex-direction: row; align-items: center; gap: 12dp; padding: 0 14dp; border-color: ${okEdge}; }
+.hero.off { border-color: ${holdEdge}; }
+.hero .switch { width: 52dp; height: 30dp; flex: 0 0 52dp; padding: 4dp; }
+.hero .switch .knob { width: 22dp; height: 22dp; }
+.hero .title { font-size: 18dp; font-weight: bold; }
+.hero .word { font-size: 18dp; font-weight: bold; color: ${ok}; margin-left: 8dp; }
+.hero.off .word { color: ${hold}; }
+.hero .line { font-size: 13dp; color: ${dim}; display: flex; flex-direction: row; align-items: center; gap: 4dp; }
+.hero.off .line { color: ${hold}; }
+.hero .pen { width: 26dp; height: 26dp; border-radius: 6dp; display: flex; flex-direction: row; align-items: center; justify-content: center; cursor: pointer; }
+.hero .pen:hover { background-color: ${accentSoft}; }
+.hero .pen svg { width: 15dp; height: 15dp; image-color: ${dim}; }
+.stats { display: flex; flex-direction: column; align-items: flex-end; gap: 2dp; }
+.stat { display: flex; flex-direction: row; align-items: baseline; gap: 6dp; margin-left: 16dp; }
+.stat .label { font-size: 13dp; color: ${dim}; }
+.stat .value { font-family: mono; font-size: 21dp; }
+.stat .value.hot { color: ${hold}; }
+.session { font-size: 12dp; color: ${dim}; }
+
+.lanes { flex: 1 1 0; min-height: 0; }
+.lanes .head { height: 26dp; flex: 0 0 26dp; display: flex; flex-direction: row; align-items: center; gap: 16dp; font-size: 14dp; color: ${dim}; }
+.lanes .head h2 { font-size: 16dp; }
+.legend { display: flex; flex-direction: row; align-items: center; gap: 6dp; }
+.legend .ln { width: 22dp; height: 3dp; border-radius: 2dp; background-color: ${accentText}; }
+.legend .ln.raw { height: 0; border-top: 2dp ${dim}; background-color: transparent; }
+.legend .strip { width: 16dp; height: 4dp; border-radius: 2dp; }
+.lanebox { flex: 1 1 0; min-height: 0; display: flex; flex-direction: row; border-radius: 10dp; overflow: hidden; background-color: ${bg}; }
+.lanelabels { width: 214dp; flex: 0 0 214dp; box-sizing: border-box; padding-bottom: 28dp; display: flex; flex-direction: column;
+	border-right: 1dp ${line}; }
+.lanerow { flex: 1 1 0; min-height: 0; overflow: hidden; box-sizing: border-box; padding: 0 10dp; display: flex; flex-direction: column;
+	justify-content: center; gap: 2dp; border-top: 1dp ${line}; }
+.lanerow.first { border-top-width: 0; }
+.lanerow.busy { background-color: ${holdTint}; }
+.lanerow.lost { background-color: ${lostTint}; }
+.lanerow .name { display: flex; flex-direction: row; align-items: center; gap: 6dp; font-size: 15dp; }
+.lanerow .name svg { width: 18dp; height: 18dp; flex: 0 0 18dp; image-color: ${text}; }
+.lanerow .name.off { color: ${dim}; }
+.lanerow .serial { font-family: mono; font-size: 12dp; color: ${dim}; padding-left: 24dp; white-space: nowrap; }
+.lanerow .status { display: flex; flex-direction: row; align-items: baseline; gap: 8dp; padding-left: 24dp; font-size: 13dp; white-space: nowrap; }
+.lanerow .drift { margin-left: auto; font-family: mono; font-size: 12dp; color: ${dim}; }
+lanegraph { display: block; flex: 1 1 0; min-width: 0; position: relative; }
+lanegraph .axis { position: absolute; font-size: 12dp; color: ${dim}; font-family: mono; }
+.empty { padding: 24dp; color: ${dim}; font-size: 15dp; }
+
+.map { height: 300dp; flex: 0 0 300dp; padding: 10dp 14dp 14dp 14dp; gap: 8dp; }
+.map .head { height: 34dp; flex: 0 0 34dp; display: flex; flex-direction: row; align-items: center; gap: 10dp; }
+.mapbox { position: relative; flex: 1 1 0; min-height: 0; border-radius: 10dp; overflow: hidden; background-color: ${bg}; }
+mapview { display: block; position: absolute; left: 0; top: 0; right: 0; bottom: 0; cursor: default; }
+mapview.orbit, mapview.pan { cursor: move; }
+.maptools { position: absolute; left: 10dp; top: 8dp; background-color: ${panel}; }
+.maptools .tip { left: 0; right: auto; }
+/* Text drawn over the map lets the pointer through, so a drag that crosses it keeps turning the view. */
+mapview .label { position: absolute; font-size: 14dp; white-space: nowrap; pointer-events: none; }
+.maphint { position: absolute; top: 8dp; right: 12dp; font-size: 12dp; color: ${dim}; pointer-events: none; }
+.maplegend { position: absolute; left: 10dp; bottom: 6dp; display: flex; flex-direction: row; gap: 12dp; font-size: 12dp; color: ${dim};
+	pointer-events: none; }
+.maplegend > span { display: flex; flex-direction: row; align-items: center; gap: 6dp; }
+.dot { width: 11dp; height: 11dp; border-radius: 999dp; }
+.dot.ring { width: 7dp; height: 7dp; border: 2dp ${hold}; }
+.dot.ghost { width: 9dp; height: 9dp; border: 2dp ${lost}; background-color: transparent; }
+.dot.sq { border-radius: 3dp; }
+
+.log { flex: 1 1 0; min-height: 0; position: relative; }
+.log .head { display: flex; flex-direction: row; align-items: center; gap: 14dp; }
+.loglines { flex: 1 1 0; min-height: 0; overflow-y: auto; font-size: 14dp; }
+.logline { display: flex; flex-direction: row; gap: 10dp; line-height: 21dp; }
+.logline .time { flex: 0 0 auto; color: ${dim}; font-family: mono; font-size: 13dp; }
+.logline .text { flex: 1 1 0; min-width: 0; word-break: break-word; } /* log lines are mostly English: break between words */
+.k-driver { color: ${text}; }
+.k-ots { color: ${beacon}; }
+.k-filter { color: ${hold}; }
+.k-ui { color: ${accentText}; }
+.count { font-size: 12dp; padding: 1dp 7dp; border-radius: 999dp; background-color: ${accent}; color: ${onAccent}; }
+.popover { position: absolute; right: 14dp; top: 50dp; z-index: 6; width: 440dp; max-height: 240dp; overflow-y: auto; box-sizing: border-box; padding: 8dp; border-radius: 12dp;
+	background-color: ${panel}; border: 1dp ${line}; box-shadow: rgba(0,0,0,0.45) 0 12dp 32dp 0; display: flex; flex-direction: column; gap: 2dp; }
+.popover .check { align-items: flex-start; padding: 8dp 10dp; border-radius: 8dp; min-height: 0; }
+.popover .check:hover { background-color: ${accentSoft}; }
+.popover .check .box { margin-top: 2dp; }
+.popover .what { display: flex; flex-direction: row; align-items: center; gap: 8dp; font-size: 15dp; }
+.popover .help { font-size: 12dp; color: ${dim}; }
+.popover .kdot { width: 8dp; height: 8dp; border-radius: 999dp; }
+.kdot.k-driver { background-color: ${text}; }
+.kdot.k-ots { background-color: ${beacon}; }
+.kdot.k-filter { background-color: ${hold}; }
+.kdot.k-ui { background-color: ${accentText}; }
+.catcher { position: absolute; left: 0; top: 0; width: 1120dp; height: 700dp; z-index: 5; }
+
+/* ---- devices screen ---- */
+.devices { padding: 12dp 16dp; }
+.bases { padding: 12dp 16dp; }
+.thead { display: flex; flex-direction: row; align-items: center; gap: 12dp; font-size: 14dp; color: ${dim}; padding: 4dp 8dp; border-bottom: 1dp ${line}; }
+/* Every header cell the same box, so the labels share one baseline whatever the column's own display is. */
+.thead > span { display: flex; flex-direction: row; align-items: center; height: 26dp; line-height: 26dp; font-size: 14dp; font-family: ui; }
+.trow { display: flex; flex-direction: row; align-items: center; gap: 12dp; min-height: 50dp; padding: 0 8dp; border-radius: 8dp; }
+.trow.alt { background-color: ${rowAlt}; }
+.c-name { flex: 1 1 0; min-width: 0; display: flex; flex-direction: row; align-items: center; gap: 10dp; }
+.c-name svg { width: 20dp; height: 20dp; flex: 0 0 20dp; }
+.c-name .model { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.c-name .serial { font-family: mono; font-size: 13dp; color: ${dim}; }
+.c-correct { width: 64dp; flex: 0 0 64dp; }
+.c-batt { width: 80dp; flex: 0 0 80dp; display: flex; flex-direction: row; align-items: center; gap: 6dp; font-family: mono; font-size: 16dp; }
+.c-batt svg { width: 18dp; height: 18dp; }
+.c-state { width: 300dp; flex: 0 0 300dp; display: flex; flex-direction: column; line-height: 21dp; font-size: 16dp; }
+.c-state .sub { font-size: 13dp; color: ${dim}; }
+.c-holds { width: 90dp; flex: 0 0 90dp; font-family: mono; font-size: 16dp; }
+.c-serial { flex: 1 1 0; min-width: 0; display: flex; flex-direction: row; align-items: center; gap: 10dp; }
+.c-serial svg { width: 20dp; height: 20dp; flex: 0 0 20dp; }
+.c-height { width: 90dp; flex: 0 0 90dp; font-family: mono; font-size: 15dp; }
+.c-tilt { width: 90dp; flex: 0 0 90dp; font-family: mono; font-size: 15dp; }
+.c-bsstate { width: 300dp; flex: 0 0 300dp; font-size: 16dp; }
+.mark { width: 12dp; height: 12dp; flex: 0 0 12dp; border-radius: 3dp; background-color: ${beacon}; }
+.mark.off { background-color: ${dim}; }
+.s-ok { color: ${ok}; }
+.s-hold { color: ${hold}; }
+.s-lost { color: ${lost}; }
+.s-dim { color: ${dim}; }
+svg.s-ok { image-color: ${ok}; }
+svg.s-hold { image-color: ${hold}; }
+svg.s-lost { image-color: ${lost}; }
+svg.s-dim { image-color: ${dim}; }
+svg.s-text { image-color: ${text}; }
+.busy-dot { color: ${hold}; }
+
+/* ---- settings screen ---- */
+.settings { flex: 1 1 0; min-width: 0; padding: 12dp 16dp; gap: 8dp; overflow-y: auto; }
+.settings > *, .sidecol .panel > * { flex: 0 0 auto; } /* overflowing flex columns would otherwise squash their items */
+.sidecol .panel > .grow { flex: 1 1 0; }
+.settings p { font-size: 14dp; color: ${dim}; }
+.sidecol { width: 420dp; flex: 0 0 420dp; display: flex; flex-direction: column; gap: 12dp; overflow-y: auto; }
+.sidecol > * { flex: 0 0 auto; }
+.sidecol .panel { padding: 12dp 16dp; gap: 10dp; }
+.sep { height: 1dp; flex: 0 0 1dp; background-color: ${line}; }
+.group { margin-top: 4dp; font-size: 14dp; font-weight: bold; color: ${dim}; }
+.param { display: flex; flex-direction: column; gap: 2dp; }
+.param .top { display: flex; flex-direction: row; align-items: center; gap: 14dp; }
+.param .name { width: 214dp; flex: 0 0 214dp; font-size: 15dp; }
+.param .val { width: 76dp; flex: 0 0 76dp; text-align: right; font-family: mono; font-size: 15dp; }
+.param .help { font-size: 13dp; color: ${dim}; padding-left: 228dp; }
+.warnline { display: flex; flex-direction: row; align-items: flex-start; gap: 8dp; padding-left: 30dp; font-size: 13dp; color: ${hold}; }
+.warnline svg { width: 16dp; height: 16dp; flex: 0 0 16dp; image-color: ${hold}; margin-top: 1dp; }
+
+input.range { flex: 1 1 0; height: 28dp; }
+input.range slidertrack { margin-top: 11dp; height: 6dp; border-radius: 3dp; background-color: ${line}; }
+input.range sliderprogress { height: 6dp; border-radius: 3dp; background-color: ${accent}; }
+input.range sliderbar { margin-top: 2dp; width: 24dp; height: 24dp; margin-left: -12dp; margin-right: -12dp; border-radius: 999dp;
+	background-color: #ffffff; border: 2dp ${accent}; box-sizing: border-box; }
+input.range sliderbar:hover, input.range sliderbar:active { background-color: ${accentSoftSolid}; }
+input.range sliderarrowdec, input.range sliderarrowinc { width: 0; height: 0; }
+
+.themes { display: flex; flex-direction: row; flex-wrap: wrap; gap: 12dp; }
+.theme { width: 172dp; flex: 0 0 172dp; box-sizing: border-box; padding: 8dp; border-radius: 12dp; border: 2dp transparent;
+	background-color: ${button}; display: flex; flex-direction: column; gap: 10dp; cursor: pointer; }
+.theme.on { background-color: ${accentSoft}; border-color: ${accent}; }
+.theme .preview { height: 52dp; box-sizing: border-box; border-radius: 8dp; padding: 6dp; display: flex; flex-direction: row; gap: 8dp; border: 1dp; }
+.theme .pv-panel { flex: 1 1 0; box-sizing: border-box; border-radius: 6dp; padding: 6dp; display: flex; flex-direction: column; gap: 5dp; }
+.theme .pv-bar { height: 7dp; border-radius: 4dp; width: 55%; }
+.theme .pv-line { height: 5dp; border-radius: 3dp; width: 85%; opacity: 0.45; }
+.theme .pv-dots { width: 14dp; flex: 0 0 14dp; display: flex; flex-direction: column; justify-content: center; gap: 4dp; }
+.theme .pv-dot { width: 10dp; height: 10dp; border-radius: 999dp; }
+.theme .tname { display: flex; flex-direction: row; align-items: center; gap: 6dp; padding: 0 2dp; font-size: 14dp; }
+.tag { font-size: 12dp; padding: 2dp 8dp; border-radius: 999dp; background-color: ${accentSoft}; }
+
+.about .who { display: flex; flex-direction: row; align-items: flex-start; gap: 14dp; }
+.about img.big { width: 48dp; height: 48dp; flex: 0 0 48dp; }
+.about img.avatar { width: 28dp; height: 28dp; border-radius: 999dp; }
+.about .appname { font-size: 17dp; font-weight: bold; }
+.about .by { display: flex; flex-direction: row; align-items: center; gap: 8dp; font-size: 14dp; }
+.about .gh { font-family: mono; color: ${dim}; font-size: 13dp; }
+
+/* ---- toast ---- */
+.toast { position: absolute; right: 22dp; bottom: 22dp; padding: 12dp 16dp; border-radius: 12dp; background-color: ${panel};
+	border: 1dp ${accent}; font-size: 16dp; box-shadow: rgba(0,0,0,0.35) 0 8dp 28dp 0; z-index: 10; }
+
+scrollbarvertical { width: 10dp; margin-left: 4dp; }
+scrollbarvertical slidertrack { background-color: transparent; }
+scrollbarvertical sliderbar { background-color: ${line}; border-radius: 5dp; min-height: 30dp; }
+scrollbarvertical sliderbar:hover { background-color: ${dim}; }
+scrollbarvertical sliderarrowdec, scrollbarvertical sliderarrowinc { width: 0; height: 0; }

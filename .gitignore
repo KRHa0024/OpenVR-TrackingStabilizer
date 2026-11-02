@@ -1,0 +1,16 @@
+/build/
+/build-*/
+/out/
+/.vs/
+CMakeSettings.json
+CMakeUserPresets.json
+__pycache__/
+*.pyc
+*.otsrec
+/analysis_out/
+
+# yomiyasu check records (contain full drafts)
+.yomiyasu/
+
+# Local Claude Code files (skills, settings)
+/.claude/

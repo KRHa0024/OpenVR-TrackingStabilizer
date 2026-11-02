@@ -1,0 +1,38 @@
+{
+	"driver_trackingstabilizer": {
+		"enable": true,
+		"hookPoses": true,
+		"hookDriverLog": true,
+		"autoRecord": false,
+		"recordDir": "",
+
+		"filterEnabled": true,
+		"filterControllers": true,
+		"filterTrackers": true,
+		"filterHmd": false,
+		"filterIncludeSerials": "",
+		"filterExcludeSerials": "",
+		"smoothing": 0.0,
+		"bodyEnabled": false,
+		"imuEnabled": false,
+		"handEnabled": false,
+		"handShoulderWidthCm": 36.0,
+		"handArmReachCm": 70.0,
+		"handMaxPredictionMs": 3000.0,
+		"bodyWaistSerial": "",
+		"bodyHmdSerial": "",
+		"bodyNeckDownCm": 12.0,
+		"bodyNeckBackCm": 8.0,
+		"suspectEnabled": false,
+		"suspectWindowMs": 50.0,
+		"streamTimeoutMs": 20.0,
+		"probationMs": 400.0,
+		"shortProbationMs": 100.0,
+		"blendMs": 200.0,
+		"stepLimitCm": 4.5,
+		"stepBlendMs": 150.0,
+		"holdReportsValid": true,
+		"maxHoldSec": 0.0,
+		"emitHz": 250.0
+	}
+}

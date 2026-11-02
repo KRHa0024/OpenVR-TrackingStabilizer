@@ -1,0 +1,289 @@
+<rml>
+<!--
+	The whole UI, shown in the SteamVR dashboard and the desktop window (same render target).
+	{%key%} is replaced with the translated string before loading (UiText.cpp), and the theme
+	colors are written into app.rcss the same way, so a language or theme change reloads this file.
+	Everything that changes at run time comes from the "app" data model in UiApp.cpp.
+	RmlUi does not lay out bare text inside a flex container, so text there is always in a <span>.
+-->
+<head>
+	<title>OpenVR Tracking Stabilizer</title>
+	<link type="text/rcss" href="app.rcss"/>
+</head>
+<body data-model="app" class="{%lang%}">
+
+<header>
+	<img class="appicon" src="icon.png"/>
+	<h1>OpenVR Tracking Stabilizer</h1>
+	<span class="version">v{{version}}</span>
+	<span class="badge" data-if="recording">● {%recordingBadge%}</span>
+	<span class="warn" data-if="warning != ''">{{warning}}</span>
+	<div class="grow"></div>
+	<nav>
+		<div class="tab" data-class-current="view == 'main'" data-event-click="setView('main')"><svg src="icons/activity.svg"/><span class="tip">{%tabMain%}</span></div>
+		<div class="tab" data-class-current="view == 'devices'" data-event-click="setView('devices')"><svg src="icons/tracker.svg"/><span class="tip">{%tabDevices%}</span></div>
+		<div class="tab" data-class-current="view == 'settings'" data-event-click="setView('settings')"><svg src="icons/settings.svg"/><span class="tip">{%tabSettings%}</span></div>
+	</nav>
+</header>
+
+<!-- ======================= correction (main) ======================= -->
+<main data-if="view == 'main'">
+	<div class="leftcol">
+		<div class="panel hero" data-class-off="!filterOn">
+			<div class="switch" data-class-on="filterOn" data-event-click="toggleFilter()"><div class="knob"></div></div>
+			<div class="grow col" style="gap: 2dp;">
+				<div class="row"><span class="title">{%correction%}</span><span class="word">{{heroWord}}</span></div>
+				<div class="line"><span class="nowrap">{{heroLine}}</span>
+					<div class="pen" data-event-click="setView('devices')"><svg src="icons/pencil.svg"/></div></div>
+			</div>
+			<div class="stats">
+				<div class="row">
+					<div class="stat"><span class="label">{%statDevices%}</span><span class="value">{{deviceCount}}</span></div>
+					<div class="stat"><span class="label">{%statHolding%}</span><span class="value" data-class-hot="holdingCount > 0">{{holdingCount}}</span></div>
+				</div>
+				<span class="session">{{sessionText}}</span>
+			</div>
+		</div>
+
+		<div class="panel lanes">
+			<div class="head">
+								<div class="grow"></div>
+				<span class="legend"><span class="ln"></span><span>{%legendOut%}</span></span>
+				<span class="legend"><span class="ln raw"></span><span>{%legendRaw%}</span></span>
+				<span class="legend"><span class="strip" style="background-color: ${hold};"></span><span>{%legendHeld%}</span></span>
+				<span class="legend"><span class="strip" style="background-color: ${lost};"></span><span>{%legendLost%}</span></span>
+			</div>
+			<div class="lanebox">
+				<div class="lanelabels">
+					<div class="lanerow" data-for="r, i : lanes" data-class-first="i == 0" data-class-busy="r.tone == 'busy'" data-class-lost="r.tone == 'lost'">
+						<div class="name" data-class-off="!r.on">
+							<svg data-attr-src="r.icon"/><span class="grow nowrap">{{r.name}}</span>
+							<div class="switch small" data-class-on="r.on" data-class-locked="r.locked" data-event-click="toggleDevice(r.index)"><div class="knob"></div></div>
+						</div>
+						<div class="serial">{{r.serial}}</div>
+						<div class="status"><span data-attr-class="'nowrap ' + r.stateClass">{{r.state}}</span><span class="drift">{{r.drift}}</span></div>
+					</div>
+				</div>
+				<lanegraph id="lanegraph">
+					<span class="axis" style="right: 14dp; bottom: 6dp;">{%now%}</span>
+					<span class="axis" style="left: 48%; bottom: 6dp;">-10s</span>
+					<span class="axis" style="left: 8dp; bottom: 6dp;">-20s</span>
+				</lanegraph>
+			</div>
+			<div class="empty" data-if="lanes.size == 0">{{lanesEmpty}}</div>
+		</div>
+	</div>
+
+	<div class="rightcol">
+		<div class="panel map">
+			<div class="head">
+				<h2><svg src="icons/map.svg"/><span>{%map%}</span></h2>
+				<div class="grow"></div>
+				<div class="btn icon" data-if="mapMode == '3d'" data-event-click="resetCamera()"><svg src="icons/rotate-ccw.svg"/></div>
+				<div class="seg icons">
+					<div data-class-on="mapMode == 'top'" data-event-click="setMapMode('top')"><svg src="icons/view-top.svg"/><span class="tip">{%mapTop%}</span></div>
+					<div data-class-on="mapMode == 'side'" data-event-click="setMapMode('side')"><svg src="icons/view-side.svg"/><span class="tip">{%mapSide%}</span></div>
+					<div data-class-on="mapMode == '3d'" data-event-click="setMapMode('3d')"><svg src="icons/box.svg"/><span class="tip">{%map3d%}</span></div>
+				</div>
+			</div>
+			<div class="mapbox">
+				<mapview id="mapview"/>
+				<div class="seg icons maptools" data-if="mapMode == '3d'">
+					<div data-class-on="!mapPan" data-event-click="setMapTool('orbit')"><svg src="icons/rotate-3d.svg"/><span class="tip">{%toolOrbit%}</span></div>
+					<div data-class-on="mapPan" data-event-click="setMapTool('pan')"><svg src="icons/move.svg"/><span class="tip">{%toolPan%}</span></div>
+				</div>
+				<div class="maphint" data-if="mapMode == '3d' &amp;&amp; !mapPan">{%mapHint%}</div>
+				<div class="maphint" data-if="mapMode == '3d' &amp;&amp; mapPan">{%mapHintPan%}</div>
+				<div class="maplegend">
+					<span><span class="dot" style="background-color: ${ok};"></span><span>{%stTracking%}</span></span>
+					<span><span class="dot ring" style="background-color: ${hold};"></span><span>{%stHold%}</span></span>
+					<span><span class="dot ghost"></span><span>{%rawPos%}</span></span>
+					<span><span class="dot sq" style="background-color: ${beacon};"></span><span>{%baseStation%}</span></span>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel log">
+			<div class="head">
+				<h2><svg src="icons/list.svg"/><span>{%log%}</span></h2>
+				<div class="grow"></div>
+				<div class="btn small" data-class-pressed="logMenu || logFiltered" data-event-click="toggleLogMenu()">
+					<svg src="icons/list-filter.svg"/><span>{%logFilterBtn%}</span><span class="count" data-if="logFiltered">{{logFilterCount}}</span>
+				</div>
+			</div>
+			<div class="loglines">
+				<div class="logline" data-for="e : log"><span class="time">{{e.time}}</span><span data-attr-class="'text ' + e.cls">{{e.text}}</span></div>
+			</div>
+			<div class="popover" data-if="logMenu">
+				<div class="check" data-for="k : logKinds" data-class-on="k.on" data-event-click="toggleLogKind(k.id)">
+					<div class="box"><svg src="icons/check.svg"/></div>
+					<div class="col" style="gap: 2dp;">
+						<div class="what"><span data-attr-class="'kdot k-' + k.id"></span><span>{{k.label}}</span></div>
+						<div class="help">{{k.help}}</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</main>
+
+<!-- ======================= devices ======================= -->
+<main class="stack" data-if="view == 'devices'">
+	<div class="panel devices">
+		<h2><svg src="icons/tracker.svg"/><span>{%devices%}</span></h2>
+		<div class="thead">
+			<span class="c-name"><span>{%colDevice%}</span></span><span class="c-correct"><span>{%colCorrect%}</span></span><span class="c-batt"><span>{%colBattery%}</span></span>
+			<span class="c-state"><span>{%colStatus%}</span></span><span class="c-holds"><span>{%colHolds%}</span></span>
+		</div>
+		<div class="trow" data-for="d : devices" data-class-alt="d.alt">
+			<div class="c-name"><svg data-attr-src="d.icon" data-attr-class="d.stateClass"/>
+				<div class="col" style="min-width: 0;"><span class="model">{{d.model}}</span><span class="serial">{{d.serial}}</span></div></div>
+			<div class="c-correct"><div class="switch" data-class-on="d.on" data-class-locked="d.locked" data-event-click="toggleDevice(d.index)"><div class="knob"></div></div></div>
+			<div data-attr-class="'c-batt ' + d.battClass"><svg data-attr-src="d.battIcon" data-if="d.hasBatt" data-attr-class="d.battClass"/><span>{{d.batt}}</span></div>
+			<div class="c-state"><span data-attr-class="d.stateClass">{{d.state}}</span><span class="sub" data-if="d.sub != ''">{{d.sub}}</span></div>
+			<div class="c-holds">{{d.holds}}</div>
+		</div>
+	</div>
+
+	<div class="panel bases">
+		<h2><svg src="icons/basestation.svg"/><span>{%baseStations%}</span></h2>
+		<div class="thead">
+			<span class="c-serial"><span>{%colSerial%}</span></span><span class="c-height"><span>{%colHeight%}</span></span><span class="c-tilt"><span>{%colTilt%}</span></span>
+			<span class="c-bsstate"><span>{%colState%}</span></span>
+		</div>
+		<div class="trow" data-for="b : bases" data-class-alt="b.alt">
+			<div class="c-serial"><svg src="icons/basestation.svg" data-attr-class="b.stateClass"/>
+				<div class="col" style="min-width: 0;"><span class="mono" style="font-size: 15dp;">{{b.serial}}</span>
+					<span class="dim" style="font-size: 13dp;">{{b.ch}}</span></div></div>
+			<div class="c-height">{{b.height}}</div>
+			<div class="c-tilt">{{b.tilt}}</div>
+			<div class="c-bsstate"><span data-attr-class="b.stateClass">{{b.state}}</span></div>
+		</div>
+	</div>
+</main>
+
+<!-- ======================= settings ======================= -->
+<main data-if="view == 'settings'">
+	<div class="panel settings">
+		<h2><svg src="icons/sliders-horizontal.svg"/><span>{%filterTitle%}</span></h2>
+		<p>{%filterNote%}</p>
+		<div class="btn" style="align-self: flex-start;" data-event-click="setView('devices')">
+			<svg src="icons/tracker.svg"/><span>{%changeTargets%}</span><svg src="icons/chevron-right.svg"/>
+		</div>
+		<div class="col" style="gap: 4dp;">
+			<div class="check" data-class-on="allowHmd" data-event-click="toggleAllowHmd()"><div class="box"><svg src="icons/check.svg"/></div><span>{%allowHmd%}</span></div>
+			<div class="warnline"><svg src="icons/triangle-alert.svg"/><span class="grow">{%allowHmdWarn%}</span></div>
+		</div>
+		<div class="sep"></div>
+		<h3>{%bodyTitle%}</h3>
+		<div class="check" data-class-on="imuEnabled" data-event-click="toggleImu()"><div class="box"><svg src="icons/check.svg"/></div><span>{%imuToggle%}</span></div>
+		<p data-if="imuEnabled">{%imuHelp%}</p>
+		<p>{{imuStatus}}</p>
+		<div class="check" data-class-on="modelOnMap" data-event-click="toggleModelMap()"><div class="box"><svg src="icons/check.svg"/></div><span>{%modelOnMap%}</span></div>
+		<div class="check" data-class-on="modelInVr" data-event-click="toggleModelVr()"><div class="box"><svg src="icons/check.svg"/></div><span>{%modelInVr%}</span></div>
+		<div class="check" data-class-on="handEnabled" data-event-click="toggleHand()"><div class="box"><svg src="icons/check.svg"/></div><span>{%handToggle%}</span></div>
+		<p data-if="handEnabled">{%handHelp%}</p>
+		<p>{{handStatus}}</p>
+		<div class="check" data-class-on="bodyEnabled" data-event-click="toggleBody()"><div class="box"><svg src="icons/check.svg"/></div><span>{%bodyToggle%}</span></div>
+		<p data-if="bodyEnabled">{%bodyHelp%}</p>
+		<p>{{bodyStatus}}</p>
+		<div class="col" style="gap: 8dp;" data-if="bodyEnabled">
+		<div class="group">{%bodyWaist%}: {{bodyWaist}}</div>
+		<div class="row" style="gap: 8dp; flex-wrap: wrap;">
+			<div class="btn" data-for="d : bodyWaistChoices" data-class-pressed="d.on" data-event-click="setBodyDevice('waist', d.index)"><span>{{d.model}} ({{d.serial}})</span></div>
+			<div class="btn" data-event-click="setBodyDevice('waist', -1)"><span>{%bodyClear%}</span></div>
+		</div>
+		</div>
+		<div class="col" style="gap: 8dp;" data-if="bodyEnabled || handEnabled">
+		<div class="group">{%bodyHmd%}: {{bodyHmd}}</div>
+		<div class="row" style="gap: 8dp; flex-wrap: wrap;">
+			<div class="btn" data-for="d : bodyHmdChoices" data-class-pressed="d.on" data-event-click="setBodyDevice('head', d.index)"><span>{{d.model}} ({{d.serial}})</span></div>
+			<div class="btn" data-event-click="setBodyDevice('head', -1)"><span>{%bodyClear%}</span></div>
+		</div>
+		</div>
+		<div class="sep"></div>
+		<div class="param" data-for="p : params">
+			<div class="group" data-if="p.group != ''">{{p.group}}</div>
+			<div class="top">
+				<span class="name">{{p.label}}</span>
+				<input type="range" min="0" max="1000" step="1" data-attr-value="p.slider"
+					data-event-change="setParam(p.key, ev.value)"/>
+				<span class="val">{{p.display}}</span>
+			</div>
+			<div class="help">{{p.help}}</div>
+		</div>
+		<div class="row" style="gap: 10dp;">
+			<div class="btn" data-event-click="resetParams()"><svg src="icons/rotate-ccw.svg"/><span>{%resetDefaults%}</span></div>
+		</div>
+		<div class="sep"></div>
+		<h3>{%recordTitle%}</h3>
+		<p style="margin-top: -6dp; font-size: 13dp;">{%recordNote%}</p>
+		<div class="row" style="gap: 10dp;">
+			<div class="btn" data-event-click="toggleRecording()"><svg data-attr-src="recordIcon"/><span>{{recordLabel}}</span></div>
+			<div class="btn" data-if="recording" data-event-click="addMarker()"><svg src="icons/flag.svg"/><span>{%addMarker%}</span></div>
+		</div>
+	</div>
+
+	<div class="sidecol">
+		<div class="panel" style="flex-direction: row; align-items: center; gap: 16dp;">
+			<h2><svg src="icons/languages.svg"/><span>{%language%}</span></h2>
+			<div class="grow"></div>
+			<div class="seg big">
+				<div data-class-on="lang == 'en'" data-event-click="setLang('en')"><span>English</span></div>
+				<div data-class-on="lang == 'ja'" data-event-click="setLang('ja')"><span>日本語</span></div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<h2><svg src="icons/palette.svg"/><span>{%theme%}</span></h2>
+			<div class="themes">
+				<div class="theme" data-for="t : themes" data-class-on="t.active" data-event-click="setTheme(t.index)">
+					<div class="preview" data-style-background-color="t.bg" data-style-border-color="t.edge">
+						<div class="pv-panel" data-style-background-color="t.panel">
+							<div class="pv-bar" data-style-background-color="t.accent"></div>
+							<div class="pv-line" data-style-background-color="t.text"></div>
+							<div class="pv-line" data-style-background-color="t.text" style="width: 70%;"></div>
+						</div>
+						<div class="pv-dots">
+							<div class="pv-dot" data-style-background-color="t.ok"></div>
+							<div class="pv-dot" data-style-background-color="t.hold"></div>
+							<div class="pv-dot" data-style-background-color="t.lost"></div>
+						</div>
+					</div>
+					<div class="tname"><span>{{t.name}}</span><span class="tag" data-if="t.isDefault">{%defaultTag%}</span></div>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel">
+			<h2><svg src="icons/monitor.svg"/><span>{%display%}</span></h2>
+			<div class="check" data-class-on="desktopWindow" data-event-click="toggleDesktop()"><div class="box"><svg src="icons/check.svg"/></div><span>{%desktopWindow%}</span></div>
+			<div class="row" style="gap: 12dp;">
+				<span class="dim" style="width: 150dp;">{%mapDefault%}</span>
+				<div class="seg icons">
+					<div data-class-on="mapMode == 'top'" data-event-click="setMapMode('top')"><svg src="icons/view-top.svg"/><span class="tip">{%mapTop%}</span></div>
+					<div data-class-on="mapMode == 'side'" data-event-click="setMapMode('side')"><svg src="icons/view-side.svg"/><span class="tip">{%mapSide%}</span></div>
+					<div data-class-on="mapMode == '3d'" data-event-click="setMapMode('3d')"><svg src="icons/box.svg"/><span class="tip">{%map3d%}</span></div>
+				</div>
+			</div>
+			<p style="font-size: 13dp; word-break: break-all;">{%savedTo%} {{settingsPath}}</p>
+		</div>
+
+		<div class="panel about">
+			<h2><svg src="icons/info.svg"/><span>{%about%}</span></h2>
+			<div class="who">
+				<img class="big" src="icon.png"/>
+				<div class="grow col" style="gap: 6dp;">
+					<div class="row" style="gap: 8dp; align-items: baseline;"><span class="appname">OpenVR Tracking Stabilizer</span><span class="mono dim" style="font-size: 13dp;">v{{version}}</span></div>
+					<div class="by"><span class="dim">{%madeBy%}</span><img class="avatar" src="author.png"/><span>{%creator%}</span><span class="gh">@KRHa_0024</span></div>
+					<div class="btn" style="align-self: flex-start; margin-top: 4dp;" data-event-click="openGithub()"><svg src="icons/github.svg"/><span>GitHub</span></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</main>
+
+<div class="catcher" data-if="logMenu" data-event-click="closeLogMenu()"></div>
+<div class="toast" data-if="toast != ''">{{toast}}</div>
+</body>
+</rml>
